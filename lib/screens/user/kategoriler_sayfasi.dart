@@ -86,19 +86,25 @@ class _KategorilerSayfasiState extends State<KategorilerSayfasi> {
     }
   }
 
-  Future<void> _favoriToggle(int urunId) async {
+  Future<void> _favoriToggle(int urunId, String urunAdi) async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
 
     final zatenFavori = _favoriUrunIdleri.contains(urunId);
+    final supabase = Supabase.instance.client;
 
     try {
       if (zatenFavori) {
-        await Supabase.instance.client
+        await supabase
             .from('favoriler')
             .delete()
             .eq('kullanici_mail', user.email!)
             .eq('urunid', urunId);
+
+        await supabase.from('logs').insert({
+          'islem': 'Favoriden kaldırıldı: $urunAdi',
+          'kullanici_mail': user.email!,
+        });
 
         if (mounted) {
           setState(() => _favoriUrunIdleri.remove(urunId));
@@ -110,9 +116,14 @@ class _KategorilerSayfasiState extends State<KategorilerSayfasi> {
           );
         }
       } else {
-        await Supabase.instance.client.from('favoriler').insert({
+        await supabase.from('favoriler').insert({
           'kullanici_mail': user.email,
           'urunid': urunId,
+        });
+
+        await supabase.from('logs').insert({
+          'islem': 'Favoriye eklendi: $urunAdi',
+          'kullanici_mail': user.email!,
         });
 
         if (mounted) {
@@ -145,11 +156,22 @@ class _KategorilerSayfasiState extends State<KategorilerSayfasi> {
     setState(() => _aramaYapiliyor = true);
     try {
       final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+
       final data = await supabase
           .from('urun')
           .select('*')
           .or('urunadi.ilike.$aramaMetni%,barkod.ilike.$aramaMetni%')
           .limit(10);
+
+      // Arama logunu kaydet (sonuç varsa)
+      if (user != null && (data as List).isNotEmpty) {
+        await supabase.from('logs').insert({
+          'islem': 'Ürün arandı: $aramaMetni',
+          'kullanici_mail': user.email!,
+        });
+      }
+
       setState(() {
         _aramaSonuclari = data;
         _aramaYapiliyor = false;
@@ -191,6 +213,7 @@ class _KategorilerSayfasiState extends State<KategorilerSayfasi> {
         final urun = _aramaSonuclari[index];
         final String durum = urun['durum'] ?? '';
         final int urunId = urun['urunid'];
+        final String urunAdi = urun['urunadi'] ?? '';
         final bool favori = _favoriUrunIdleri.contains(urunId);
 
         Color durumRengi = Colors.grey;
@@ -223,7 +246,7 @@ class _KategorilerSayfasiState extends State<KategorilerSayfasi> {
               child: Icon(Icons.inventory_2, color: durumRengi),
             ),
             title: Text(
-              urun['urunadi'] ?? '',
+              urunAdi,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             subtitle: Column(
@@ -247,9 +270,9 @@ class _KategorilerSayfasiState extends State<KategorilerSayfasi> {
             trailing: IconButton(
               icon: Icon(
                 favori ? Icons.favorite : Icons.favorite_border,
-                color: favori ? Colors.green : Colors.green,
+                color: Colors.green,
               ),
-              onPressed: () => _favoriToggle(urunId),
+              onPressed: () => _favoriToggle(urunId, urunAdi),
             ),
           ),
         );

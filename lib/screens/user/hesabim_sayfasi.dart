@@ -145,6 +145,123 @@ class _HesabimPageState extends State<HesabimPage> {
     );
   }
 
+  // --- Hareketlerim ---
+  void _hareketleriGoster() {
+    final email = supabase.auth.currentUser?.email ?? '';
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        maxChildSize: 0.95,
+        minChildSize: 0.4,
+        expand: false,
+        builder: (context, scrollController) => Column(
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              "Hareketlerim",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Divider(),
+            Expanded(
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: supabase
+                    .from('logs')
+                    .select('islem, tarih')
+                    .eq('kullanici_mail', email)
+                    .order('tarih', ascending: false),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(color: Color(0xFF2E7D32)),
+                    );
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        "Henüz hareket kaydı yok.",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    );
+                  }
+                  final logs = snapshot.data!;
+                  return ListView.separated(
+                    controller: scrollController,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    itemCount: logs.length,
+                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    itemBuilder: (context, index) {
+                      final log = logs[index];
+                      final islem = log['islem'] ?? '';
+                      final tarih = log['tarih'] != null
+                          ? DateTime.parse(log['tarih']).toLocal()
+                          : null;
+                      final tarihStr = tarih != null
+                          ? "${tarih.day.toString().padLeft(2, '0')}.${tarih.month.toString().padLeft(2, '0')}.${tarih.year}  ${tarih.hour.toString().padLeft(2, '0')}:${tarih.minute.toString().padLeft(2, '0')}"
+                          : '-';
+
+                      IconData ikon = Icons.info_outline;
+                      Color ikonRenk = Colors.blueGrey;
+                      if (islem.contains('Giriş')) {
+                        ikon = Icons.login;
+                        ikonRenk = Colors.green;
+                      } else if (islem.contains('Çıkış')) {
+                        ikon = Icons.logout;
+                        ikonRenk = Colors.red;
+                      } else if (islem.contains('Kayıt')) {
+                        ikon = Icons.person_add_outlined;
+                        ikonRenk = Colors.blue;
+                      } else if (islem.contains('eklendi')) {
+                        ikon = Icons.add_circle_outline;
+                        ikonRenk = Colors.green;
+                      } else if (islem.contains('silindi')) {
+                        ikon = Icons.delete_outline;
+                        ikonRenk = Colors.red;
+                      } else if (islem.contains('düzenlendi')) {
+                        ikon = Icons.edit_outlined;
+                        ikonRenk = Colors.orange;
+                      }
+
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: ikonRenk.withOpacity(0.12),
+                          child: Icon(ikon, color: ikonRenk, size: 20),
+                        ),
+                        title: Text(
+                          islem,
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                        ),
+                        subtitle: Text(
+                          tarihStr,
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // --- Gizlilik Politikası ---
   void _gizlilikGoster() {
     showDialog(
       context: context,
@@ -165,6 +282,7 @@ class _HesabimPageState extends State<HesabimPage> {
     );
   }
 
+  // --- Hakkımızda ---
   void _hakkimizdaGoster() {
     showAboutDialog(
       context: context,
@@ -178,6 +296,7 @@ class _HesabimPageState extends State<HesabimPage> {
     );
   }
 
+  // --- Menü Kartı Widget ---
   Widget _profilMenuTile(IconData icon, String title, VoidCallback onTap) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -205,9 +324,7 @@ class _HesabimPageState extends State<HesabimPage> {
           rol = "Yükleniyor...";
         } else if (snapshot.hasData && snapshot.data != null) {
           displayName = snapshot.data!['adsoyad'] ?? "İsimsiz Kullanıcı";
-          
-          // --- ÖNEMLİ: ROL KONTROLÜ BURADA ---
-          final userEmail = Supabase.instance.client.auth.currentUser?.email?.toLowerCase().trim();
+          final userEmail = supabase.auth.currentUser?.email?.toLowerCase().trim();
           if (userEmail == "fatma@gmail.com") {
             rol = "Yönetici";
           } else {
@@ -258,7 +375,6 @@ class _HesabimPageState extends State<HesabimPage> {
                             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 4),
-                          // --- DÜZELTİLEN YER: BURASI ARTIK DİNAMİK ---
                           Text(
                             rol,
                             style: const TextStyle(color: Colors.grey, fontSize: 12),
@@ -275,6 +391,7 @@ class _HesabimPageState extends State<HesabimPage> {
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
                   _profilMenuTile(Icons.manage_accounts_outlined, "Hesap Ayarları", _hesapAyarlariniGoster),
+                  _profilMenuTile(Icons.history, "Hareketlerim", _hareketleriGoster),
                   _profilMenuTile(Icons.privacy_tip_outlined, "Gizlilik Politikası", _gizlilikGoster),
                   _profilMenuTile(Icons.help_center_outlined, "Hakkımızda", _hakkimizdaGoster),
                   const SizedBox(height: 25),

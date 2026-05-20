@@ -49,19 +49,25 @@ class _KategoriUrunleriSayfasiState extends State<KategoriUrunleriSayfasi> {
     }
   }
 
-  Future<void> _favoriToggle(int urunId) async {
+  Future<void> _favoriToggle(int urunId, String urunAdi) async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
 
+    final supabase = Supabase.instance.client;
     final zatenFavori = _favoriUrunIdleri.contains(urunId);
 
     try {
       if (zatenFavori) {
-        await Supabase.instance.client
+        await supabase
             .from('favoriler')
             .delete()
             .eq('kullanici_mail', user.email!)
             .eq('urunid', urunId);
+
+        await supabase.from('logs').insert({
+          'islem': 'Favoriden kaldırıldı: $urunAdi',
+          'kullanici_mail': user.email!,
+        });
 
         if (mounted) {
           setState(() => _favoriUrunIdleri.remove(urunId));
@@ -73,9 +79,14 @@ class _KategoriUrunleriSayfasiState extends State<KategoriUrunleriSayfasi> {
           );
         }
       } else {
-        await Supabase.instance.client.from('favoriler').insert({
+        await supabase.from('favoriler').insert({
           'kullanici_mail': user.email,
           'urunid': urunId,
+        });
+
+        await supabase.from('logs').insert({
+          'islem': 'Favoriye eklendi: $urunAdi',
+          'kullanici_mail': user.email!,
         });
 
         if (mounted) {
@@ -157,6 +168,7 @@ class _KategoriUrunleriSayfasiState extends State<KategoriUrunleriSayfasi> {
                   itemBuilder: (context, index) {
                     final urun = _urunler[index];
                     final String durum = urun['durum'];
+                    final String urunAdi = urun['urunadi'] ?? '';
 
                     Color durumRengi = Colors.grey;
                     if (durum == 'Helal') durumRengi = Colors.green;
@@ -192,7 +204,7 @@ class _KategoriUrunleriSayfasiState extends State<KategoriUrunleriSayfasi> {
                           child: Icon(Icons.inventory_2, color: durumRengi),
                         ),
                         title: Text(
-                          urun['urunadi'],
+                          urunAdi,
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         subtitle: Column(
@@ -218,9 +230,9 @@ class _KategoriUrunleriSayfasiState extends State<KategoriUrunleriSayfasi> {
                         trailing: IconButton(
                           icon: Icon(
                             favori ? Icons.favorite : Icons.favorite_border,
-                            color: favori ? Colors.green : Colors.green,
+                            color: Colors.green,
                           ),
-                          onPressed: () => _favoriToggle(urun['urunid']),
+                          onPressed: () => _favoriToggle(urun['urunid'], urunAdi),
                         ),
                       ),
                     );
