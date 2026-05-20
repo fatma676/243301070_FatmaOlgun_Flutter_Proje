@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; // Supabase paketini ekledik
 
 class BarkodTaramaSayfasi extends StatefulWidget {
   const BarkodTaramaSayfasi({super.key});
@@ -23,11 +24,28 @@ class _BarkodTaramaSayfasiState extends State<BarkodTaramaSayfasi> {
       body: Stack(
         children: [
           MobileScanner(
-            onDetect: (capture) {
+           
+            onDetect: (capture) async {
               if (_tarandiMi) return;
               final barkod = capture.barcodes.firstOrNull?.rawValue;
+              
               if (barkod != null) {
                 setState(() => _tarandiMi = true);
+
+                
+                try {
+                  final supabase = Supabase.instance.client;
+                  await supabase.from('logs').insert({
+                    'islem': 'Barkod tarandı: $barkod',
+                    'kullanici_mail': supabase.auth.currentUser?.email ?? 'Bilinmeyen Kullanıcı',
+                  });
+                } catch (e) {
+                  // Log tablosunda bir hata oluşursa tarama akışını bozmasın diye debug print 
+                  debugPrint("Log yazma hatası: $e");
+                }
+                // ────────────────────────────────────────────────
+
+                if (!mounted) return;
                 Navigator.pop(context, barkod);
               }
             },
