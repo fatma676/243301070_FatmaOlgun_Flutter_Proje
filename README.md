@@ -2,6 +2,7 @@ HELAL GIDA SORGULAMA VE BİLGİLENDİRME SİSTEMİ
 
 243301070 - Fatma Olgun
 
+
 1. Yönetici (Admin) Hesabı
    
  E-posta: fatma@gmail.com
@@ -10,13 +11,14 @@ HELAL GIDA SORGULAMA VE BİLGİLENDİRME SİSTEMİ
  
  Yetki Seviyesi: Ürün arama, barkod tarama, favorilere ekleme, profil ayarları, yeni ürün ekleme, ürün düzenleme, ürün silme ve kendi log kaydını görüntüleme.
 
- 3. Kullanıcı Hesabı
+2. Kullanıcı Hesabı
     
  E-posta: ela@gmail.com
  
  Şifre: ela123
  
  Yetki Seviyesi: Ürün arama, barkod tarama, favorilere ekleme, profil ayarları, kendi log kaydını görüntüleme.
+ 
 
  Kullanılan Paketler
  
