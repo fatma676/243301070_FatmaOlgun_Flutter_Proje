@@ -27,7 +27,7 @@ HELAL GIDA SORGULAMA VE BİLGİLENDİRME SİSTEMİ
   </tr>
   <tr>
     <td><img src="https://github.com/user-attachments/assets/c09ce048-26e5-4938-b2f3-369bb64ba91e" width="200" alt="ekran5"/></td>
-    <td><img src="https://github.com/user-attachments/assets/fa4a1816-9128-42f3-9cd3-e69c9e06d819" width="200" alt="ekran6"/></td>
+    <td><img src="https://github.com/user-attachments/assets/fa4a1816-9418-42f3-9cd3-e69c9e06d819" width="200" alt="ekran6"/></td>
     <td><img src="https://github.com/user-attachments/assets/031f950e-aeb7-4c9c-82f9-060327a1334d" width="200" alt="ekran7"/></td>
     <td><img src="https://github.com/user-attachments/assets/241a872e-860c-47d9-98ae-1e6a53501bdb" width="200" alt="ekran8"/></td>
   </tr>
