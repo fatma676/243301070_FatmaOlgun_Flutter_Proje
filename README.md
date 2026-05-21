@@ -19,16 +19,17 @@ HELAL GIDA SORGULAMA VE BİLGİLENDİRME SİSTEMİ
 
  Uygulamanın Ekran Görüntüleri
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/e160c044-4776-4e0f-b577-83aae2cffa5e" width="220" alt="ekran1" />
-  <img src="https://github.com/user-attachments/assets/0e47d06d-c72c-43af-97a6-825efe12bfa3" width="220" alt="ekran2" />
-  <img src="https://github.com/user-attachments/assets/cac742cb-c274-4ac4-9b29-59ec1a121bf5" width="220" alt="ekran3" />
-  <img src="https://github.com/user-attachments/assets/7a244090-c2c6-4db0-ba75-302a584ddc5a" width="220" alt="ekran4" />
+  <img src="assets/ekran1.png" width="220" alt="ekran1" />
+  <img src="assets/ekran2.png" width="220" alt="ekran2" />
+  <img src="assets/ekran3.png" width="220" alt="ekran3" />
+  <img src="assets/ekran4.png" width="220" alt="ekran4" />
 </p>
+
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/c09ce048-26e5-4938-b2f3-369bb64ba91e" width="220" alt="ekran5" />
-  <img src="https://github.com/user-attachments/assets/fa4a1816-9128-42f3-9cd3-e69c9e06d819" width="220" alt="ekran6" />
-  <img src="https://github.com/user-attachments/assets/031f950e-aeb7-4c9c-82f9-060327a1334d" width="220" alt="ekran7" />
-  <img src="https://github.com/user-attachments/assets/241a872e-860c-47d9-98ae-1e6a53501bdb" width="220" alt="ekran8" />
+  <img src="assets/ekran5.png" width="220" alt="ekran5" />
+  <img src="assets/ekran6.png" width="220" alt="ekran6" />
+  <img src="assets/ekran7.png" width="220" alt="ekran7" />
+  <img src="assets/ekran8.png" width="220" alt="ekran8" />
 </p>
 
 
